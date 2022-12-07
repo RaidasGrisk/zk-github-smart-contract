@@ -37,7 +37,7 @@ export class RedditAccountProof extends SmartContract {
     this.oraclePublicKey.set(PublicKey.fromBase58(ORACLE_PUBLIC_KEY));
 
     // not sure if we need this right now
-    // this.requireSignature();
+    this.requireSignature();
   }
 
   @method verify(isRedditUser: Field, signature: Signature, publicKey: PublicKey) {
@@ -46,7 +46,7 @@ export class RedditAccountProof extends SmartContract {
     const oraclePublicKey = this.oraclePublicKey.get();
     this.oraclePublicKey.assertEquals(oraclePublicKey);
 
-    // verify the data validity
+    // verify data validity
     const validSignature = signature.verify(oraclePublicKey, [isRedditUser]);
     validSignature.assertTrue();
 
@@ -55,26 +55,3 @@ export class RedditAccountProof extends SmartContract {
     this.emitEvent('verified', publicKey);
   }
 }
-
-// // call the oracle
-// const response = await fetch(
-//   'https://zk-oracle-2qz4wkdima-uc.a.run.app/auth',
-//   {
-//     method: 'POST',
-//     headers: {
-//       'Accept': 'application/json',
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({
-//       username: "ioWxss6",
-//       password: "KJHIASd875as6da",
-//       clientid: "LGObhaoiF614kjhads-j9a7dsG",
-//       clientsecret: "KJhkaghdaf7ghkJHgs8alwerkhfs76"
-//     })
-//   }
-// )
-// const data = await response.json()
-// get the oracle data
-// const isRedditUser = Field(data.data.isRedditUser)
-// const publicKey = Field(data.data.publickKey)
-// const signature = Signature.fromJSON(data.signature)

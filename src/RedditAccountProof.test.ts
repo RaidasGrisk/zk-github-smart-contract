@@ -86,10 +86,10 @@ describe('RedditAccountProof', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: 'ioWxss6',
-          password: 'KJHIASd875as6da',
-          clientid: 'LGObhaoiF614kjhads-j9a7dsG',
-          clientsecret: 'KJhkaghdaf7ghkJHgs8alwerkhfs76',
+          username: "ioWxss6",
+          password: "KJHIASd875as6da",
+          clientid: "LGObhaoiF614kjhads-j9a7dsG",
+          clientsecret: "KJhkaghdaf7ghkJHgs8alwerkhfs76"
         }),
       }
     );
@@ -99,8 +99,9 @@ describe('RedditAccountProof', () => {
     const signature = Signature.fromJSON(data.signature);
 
     // update transaction
+    let publicKeyToEvent = PrivateKey.random()
     const txn = await Mina.transaction(deployerAccount, () => {
-      zkApp.verify(isRedditUser, signature, deployerAccount.toPublicKey());
+      zkApp.verify(isRedditUser, signature, publicKeyToEvent.toPublicKey());
     });
     await txn.prove();
     await txn.send();
