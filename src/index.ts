@@ -1,3 +1,3 @@
-import { RedditAccountProof } from './RedditAccountProof.js';
+import { GithubAccountProof } from './GithubAccountProof.js';
 
-export { RedditAccountProof };
+export { GithubAccountProof };

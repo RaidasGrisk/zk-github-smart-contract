@@ -1,6 +1,6 @@
 import { Mina, PrivateKey, shutdown, Field, Signature, fetchAccount } from 'snarkyjs';
 import fs from 'fs/promises';
-import { RedditAccountProof } from './RedditAccountProof.js';
+import { GithubAccountProof } from './GithubAccountProof.js';
 
 // check command line arg
 let network = process.argv[2];
@@ -28,11 +28,11 @@ let zkAppKey = PrivateKey.fromBase58(key.privateKey);
 const Network = Mina.Network(config.url);
 Mina.setActiveInstance(Network);
 let zkAppAddress = zkAppKey.toPublicKey();
-let zkApp = new RedditAccountProof(zkAppAddress);
+let zkApp = new GithubAccountProof(zkAppAddress);
 
 // compile the contract to create prover keys
 console.log('compile the contract...');
-await RedditAccountProof.compile();
+await GithubAccountProof.compile();
 
 
 // warm the cache, or else "to_affine_exn: Got identity"?
@@ -55,7 +55,7 @@ const response = await fetch('https://zk-oracle-2qz4wkdima-uc.a.run.app/auth', {
 });
 const data = await response.json();
 console.log(data)
-const isRedditUser = Field(data.data.isRedditUser);
+const isGithubUser = Field(data.data.isGithubUser);
 const signature = Signature.fromJSON(data.signature);
 
 // call update() and send transaction
@@ -63,7 +63,7 @@ console.log('build transaction and create proof...');
 let publicKeyToEvent = PrivateKey.random().toPublicKey()
 console.log(publicKeyToEvent, publicKeyToEvent.toBase58())
 let tx = await Mina.transaction({ feePayerKey: zkAppKey, fee: 0.1e9 }, () => {
-  zkApp.verify(isRedditUser, signature, publicKeyToEvent);
+  zkApp.verify(isGithubUser, signature, publicKeyToEvent);
 });
 console.log(tx.toGraphqlQuery())
 await tx.prove();

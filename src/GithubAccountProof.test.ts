@@ -1,4 +1,4 @@
-import { RedditAccountProof } from './RedditAccountProof';
+import { GithubAccountProof } from './GithubAccountProof';
 import {
   Field,
   Mina,
@@ -20,15 +20,15 @@ import {
 let proofsEnabled = false;
 await isReady;
 
-describe('RedditAccountProof', () => {
+describe('GithubAccountProof', () => {
   let deployerAccount: PrivateKey,
     zkAppAddress: PublicKey,
     zkAppPrivateKey: PrivateKey,
-    zkApp: RedditAccountProof;
+    zkApp: GithubAccountProof;
 
   beforeAll(async () => {
     await isReady;
-    if (proofsEnabled) RedditAccountProof.compile();
+    if (proofsEnabled) GithubAccountProof.compile();
   });
 
   beforeEach(() => {
@@ -37,7 +37,7 @@ describe('RedditAccountProof', () => {
     deployerAccount = Local.testAccounts[0].privateKey;
     zkAppPrivateKey = PrivateKey.random();
     zkAppAddress = zkAppPrivateKey.toPublicKey();
-    zkApp = new RedditAccountProof(zkAppAddress);
+    zkApp = new GithubAccountProof(zkAppAddress);
   });
 
   afterAll(() => {
@@ -48,7 +48,7 @@ describe('RedditAccountProof', () => {
   });
 
   async function localDeploy(
-    zkAppInstance: RedditAccountProof,
+    zkAppInstance: GithubAccountProof,
     zkAppPrivatekey: PrivateKey,
     deployerAccount: PrivateKey
   ) {
@@ -62,8 +62,8 @@ describe('RedditAccountProof', () => {
     await txn.sign([zkAppPrivateKey]).send();
   }
 
-  it('generates and deploys the `RedditAccountProof` smart contract', async () => {
-    const zkAppInstance = new RedditAccountProof(zkAppAddress);
+  it('generates and deploys the `GithubAccountProof` smart contract', async () => {
+    const zkAppInstance = new GithubAccountProof(zkAppAddress);
     await localDeploy(zkAppInstance, zkAppPrivateKey, deployerAccount);
     const oraclePublicKey = zkApp.oraclePublicKey.get();
     console.log(oraclePublicKey);
@@ -73,7 +73,7 @@ describe('RedditAccountProof', () => {
   });
 
   it('correctly verifies oracle data', async () => {
-    const zkAppInstance = new RedditAccountProof(zkAppAddress);
+    const zkAppInstance = new GithubAccountProof(zkAppAddress);
     await localDeploy(zkAppInstance, zkAppPrivateKey, deployerAccount);
 
     // // call the oracle
@@ -82,26 +82,23 @@ describe('RedditAccountProof', () => {
       {
         method: 'POST',
         headers: {
-          Accept: 'application/json',
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: "ioWxss6",
-          password: "KJHIASd875as6da",
-          clientid: "LGObhaoiF614kjhads-j9a7dsG",
-          clientsecret: "KJhkaghdaf7ghkJHgs8alwerkhfs76"
+          personal_access_token: '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7Kd'
         }),
       }
     );
     const data = await response.json();
     console.log(data);
-    const isRedditUser = Field(data.data.isRedditUser);
+    const isValidUser = Field(data.data.isValidUser);
     const signature = Signature.fromJSON(data.signature);
 
     // update transaction
     let publicKeyToEvent = PrivateKey.random()
     const txn = await Mina.transaction(deployerAccount, () => {
-      zkApp.verify(isRedditUser, signature, publicKeyToEvent.toPublicKey());
+      zkApp.verify(isValidUser, signature, publicKeyToEvent.toPublicKey());
     });
     await txn.prove();
     await txn.send();

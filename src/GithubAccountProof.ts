@@ -16,7 +16,7 @@ const ORACLE_PUBLIC_KEY =
   'B62qphyUJg3TjMKi74T2rF8Yer5rQjBr1UyEG7Wg9XEYAHjaSiSqFv1';
 
 // smart contract
-export class RedditAccountProof extends SmartContract {
+export class GithubAccountProof extends SmartContract {
   @state(PublicKey) oraclePublicKey = State<PublicKey>();
 
   // Define contract events
@@ -40,18 +40,18 @@ export class RedditAccountProof extends SmartContract {
     this.requireSignature();
   }
 
-  @method verify(isRedditUser: Field, signature: Signature, publicKey: PublicKey) {
+  @method verify(isValidUser: Field, signature: Signature, publicKey: PublicKey) {
 
     // assert stuff
     const oraclePublicKey = this.oraclePublicKey.get();
     this.oraclePublicKey.assertEquals(oraclePublicKey);
+    isValidUser.assertEquals(Field(1));
 
-    // verify data validity
-    const validSignature = signature.verify(oraclePublicKey, [isRedditUser]);
+    // assert data validity
+    const validSignature = signature.verify(oraclePublicKey, [isValidUser]);
     validSignature.assertTrue();
 
-    // check if isRedditUser = '1' and emit an event if so
-    isRedditUser.assertEquals(Field(1));
+    // emit an event if all is fine
     this.emitEvent('verified', publicKey);
   }
 }
