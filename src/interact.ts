@@ -43,19 +43,16 @@ await fetchAccount({ publicKey: zkAppAddress });
 const response = await fetch('https://zk-oracle-2qz4wkdima-uc.a.run.app/auth', {
   method: 'POST',
   headers: {
-    Accept: 'application/json',
+    'Accept': 'application/json',
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    username: "ioWxss6",
-    password: "KJHIASd875as6da",
-    clientid: "LGObhaoiF614kjhads-j9a7dsG",
-    clientsecret: "KJhkaghdaf7ghkJHgs8alwerkhfs76"
+    "personal_access_token": "github_pat_11AHH75MA0pzDmwzBkjhsdkfjhsdfkjhdsfkjhdsfQRn3MO2BRllYIQHIPYHQy7ThDwGa"
   }),
 });
 const data = await response.json();
 console.log(data)
-const isGithubUser = Field(data.data.isGithubUser);
+const isValidUser = Field(data.data.isValidUser);
 const signature = Signature.fromJSON(data.signature);
 
 // call update() and send transaction
@@ -63,7 +60,7 @@ console.log('build transaction and create proof...');
 let publicKeyToEvent = PrivateKey.random().toPublicKey()
 console.log(publicKeyToEvent, publicKeyToEvent.toBase58())
 let tx = await Mina.transaction({ feePayerKey: zkAppKey, fee: 0.1e9 }, () => {
-  zkApp.verify(isGithubUser, signature, publicKeyToEvent);
+  zkApp.verify(isValidUser, signature, publicKeyToEvent);
 });
 console.log(tx.toGraphqlQuery())
 await tx.prove();
