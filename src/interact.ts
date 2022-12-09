@@ -1,4 +1,4 @@
-import { Mina, PrivateKey, shutdown, Field, Signature, fetchAccount } from 'snarkyjs';
+import { Mina, PrivateKey, PublicKey, shutdown, Field, Signature, fetchAccount } from 'snarkyjs';
 import fs from 'fs/promises';
 import { GithubAccountProof } from './GithubAccountProof.js';
 
@@ -47,7 +47,7 @@ const response = await fetch('https://zk-oracle-2qz4wkdima-uc.a.run.app/auth', {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    "personal_access_token": "github_pat_11AHH75MA0pzDmwzBkjhsdkfjhsdfkjhdsfkjhdsfQRn3MO2BRllYIQHIPYHQy7ThDwGa"
+    "personal_access_token": "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"
   }),
 });
 const data = await response.json();
@@ -57,10 +57,10 @@ const signature = Signature.fromJSON(data.signature);
 
 // call update() and send transaction
 console.log('build transaction and create proof...');
-let publicKeyToEvent = PrivateKey.random().toPublicKey()
-console.log(publicKeyToEvent, publicKeyToEvent.toBase58())
-let tx = await Mina.transaction({ feePayerKey: zkAppKey, fee: 0.1e9 }, () => {
-  zkApp.verify(isValidUser, signature, publicKeyToEvent);
+let privateKeyUser = PrivateKey.fromBase58('EKF8fzoJABdDdo4p5FSnPhMto8GgmG3kJKvxSBMvpiYw92BCCzYT')
+let publicKeyUser = PublicKey.fromBase58('B62qqpdfHhiWvv4hPRXvBNMKRUt5avuekKvZoErLSztf1jca6w985GM')
+let tx = await Mina.transaction({ feePayerKey: privateKeyUser, fee: 0.1e9 }, () => {
+  zkApp.verify(isValidUser, signature, publicKeyUser);
 });
 console.log(tx.toGraphqlQuery())
 await tx.prove();
