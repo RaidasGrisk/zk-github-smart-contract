@@ -62,10 +62,10 @@ let publicKeyUser = PublicKey.fromBase58('B62qqpdfHhiWvv4hPRXvBNMKRUt5avuekKvZoE
 let tx = await Mina.transaction({ feePayerKey: privateKeyUser, fee: 0.1e9 }, () => {
   zkApp.verify(isValidUser, signature, publicKeyUser);
 });
-console.log(tx.toGraphqlQuery())
+// console.log(tx.toGraphqlQuery())
 await tx.prove();
 console.log('send transaction...');
-console.log('TX JSON', tx.toJSON())
+// console.log('TX JSON', tx.toJSON())
 let sentTx = await tx.send();
 
 if (sentTx.hash() !== undefined) {
