@@ -47,7 +47,7 @@ const response = await fetch('https://zk-oracle-2qz4wkdima-uc.a.run.app/auth', {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    "personal_access_token": "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"
+    "personal_access_token": "github_pat_11AHH75MA05N4vwWrBgD9i_DSkVqNedwkjhasgdkjahsdkjahsdkjoARCUkDJS6N3YNNYyQF5IBy"
   }),
 });
 const data = await response.json();
@@ -65,6 +65,7 @@ let tx = await Mina.transaction({ feePayerKey: privateKeyUser, fee: 0.1e9 }, () 
 console.log(tx.toGraphqlQuery())
 await tx.prove();
 console.log('send transaction...');
+console.log('TX JSON', tx.toJSON())
 let sentTx = await tx.send();
 
 if (sentTx.hash() !== undefined) {
