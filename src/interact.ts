@@ -1,6 +1,14 @@
 import { Mina, PrivateKey, PublicKey, shutdown, Field, Signature, fetchAccount } from 'snarkyjs';
 import fs from 'fs/promises';
 import { GithubAccountProof } from './GithubAccountProof.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const PRIVATE_KEY_TEST_USER = process.env.PRIVATE_KEY_TEST_USER ?? '';
+const PUBLIC_KEY_TEST_USER = process.env.PUBLIC_KEY_TEST_USER ?? '';
+const ORACLE_URL = 'https://zk-oracle-2qz4wkdima-uc.a.run.app/auth';
+const PERSONAL_ACCESS_TOKEN = process.env.PERSONAL_ACCESS_TOKEN;
+console.log(process.env.PERSONAL_ACCESS_TOKEN)
 
 // check command line arg
 let network = process.argv[2];
@@ -16,9 +24,9 @@ node build/src/interact.js berkeley
 Error.stackTraceLimit = 1000;
 
 // parse config and private key from file
-type Config = { networks: Record<string, { url: string; keyPath: string }> };
+type Config = { deployAliases: Record<string, { url: string; keyPath: string }> };
 let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
-let config = configJson.networks[network];
+let config = configJson.deployAliases[network];
 let key: { privateKey: string } = JSON.parse(
   await fs.readFile(config.keyPath, 'utf8')
 );
@@ -34,20 +42,18 @@ let zkApp = new GithubAccountProof(zkAppAddress);
 console.log('compile the contract...');
 await GithubAccountProof.compile();
 
-
 // warm the cache, or else "to_affine_exn: Got identity"?
 // https://github.com/o1-labs/snarkyjs/issues/530
 await fetchAccount({ publicKey: zkAppAddress });
 
 // // call the oracle
-const response = await fetch('https://zk-oracle-2qz4wkdima-uc.a.run.app/auth', {
+const response = await fetch(ORACLE_URL, {
   method: 'POST',
   headers: {
-    'Accept': 'application/json',
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    "personal_access_token": "github_pat_11AHH75MA05N4vwWrBgD9i_DSkVqNedwkjhasgdkjahsdkjahsdkjoARCUkDJS6N3YNNYyQF5IBy"
+    "personal_access_token": PERSONAL_ACCESS_TOKEN
   }),
 });
 const data = await response.json();
@@ -57,15 +63,17 @@ const signature = Signature.fromJSON(data.signature);
 
 // call update() and send transaction
 console.log('build transaction and create proof...');
-let privateKeyUser = PrivateKey.fromBase58('EKF8fzoJABdDdo4p5FSnPhMto8GgmG3kJKvxSBMvpiYw92BCCzYT')
-let publicKeyUser = PublicKey.fromBase58('B62qqpdfHhiWvv4hPRXvBNMKRUt5avuekKvZoErLSztf1jca6w985GM')
+let privateKeyUser = PrivateKey.fromBase58(PRIVATE_KEY_TEST_USER)
+let publicKeyUser = PublicKey.fromBase58(PUBLIC_KEY_TEST_USER)
+// let privateKeyUser = PrivateKey.random()
+// let publicKeyUser = privateKeyUser.toPublicKey()
 let tx = await Mina.transaction({ feePayerKey: privateKeyUser, fee: 0.1e9 }, () => {
   zkApp.verify(isValidUser, signature, publicKeyUser);
 });
 // console.log(tx.toGraphqlQuery())
 await tx.prove();
 console.log('send transaction...');
-// console.log('TX JSON', tx.toJSON())
+console.log('TX JSON', tx.toJSON())
 let sentTx = await tx.send();
 
 if (sentTx.hash() !== undefined) {

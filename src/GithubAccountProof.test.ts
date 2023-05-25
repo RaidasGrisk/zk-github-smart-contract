@@ -6,9 +6,9 @@ import {
   PublicKey,
   AccountUpdate,
   Signature,
-  isReady,
   shutdown,
 } from 'snarkyjs';
+import dotenv from 'dotenv';
 
 /*
  * This file specifies how to test the `Add` example smart contract. It is safe to delete this file and replace
@@ -18,7 +18,12 @@ import {
  */
 
 let proofsEnabled = false;
-await isReady;
+
+dotenv.config();
+const ORACLE_URL = 'https://zk-oracle-2qz4wkdima-uc.a.run.app/auth';
+const ORACLE_PUBLIC_KEY = 'B62qqJQ4ys9ZwsBXTBNWopXUJswAh91pYXhpvFW6pCnWQoeGq9FqVSZ';
+const PERSONAL_ACCESS_TOKEN = process.env.PERSONAL_ACCESS_TOKEN;
+console.log(process.env.PERSONAL_ACCESS_TOKEN)
 
 describe('GithubAccountProof', () => {
   let deployerAccount: PrivateKey,
@@ -27,7 +32,6 @@ describe('GithubAccountProof', () => {
     zkApp: GithubAccountProof;
 
   beforeAll(async () => {
-    await isReady;
     if (proofsEnabled) GithubAccountProof.compile();
   });
 
@@ -68,7 +72,7 @@ describe('GithubAccountProof', () => {
     const oraclePublicKey = zkApp.oraclePublicKey.get();
     console.log(oraclePublicKey);
     expect(oraclePublicKey).toEqual(
-      PublicKey.fromBase58('B62qphyUJg3TjMKi74T2rF8Yer5rQjBr1UyEG7Wg9XEYAHjaSiSqFv1')
+      PublicKey.fromBase58(ORACLE_PUBLIC_KEY)
     );
   });
 
@@ -78,7 +82,7 @@ describe('GithubAccountProof', () => {
 
     // // call the oracle
     const response = await fetch(
-      'https://zk-oracle-2qz4wkdima-uc.a.run.app/auth',
+      ORACLE_URL,
       {
         method: 'POST',
         headers: {
@@ -86,12 +90,12 @@ describe('GithubAccountProof', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          personal_access_token: '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7Kd'
+          personal_access_token: PERSONAL_ACCESS_TOKEN
         }),
       }
     );
     const data = await response.json();
-    console.log(data);
+    console.log('Oracle response: ', data);
     const isValidUser = Field(data.data.isValidUser);
     const signature = Signature.fromJSON(data.signature);
 

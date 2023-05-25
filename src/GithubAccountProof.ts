@@ -13,7 +13,7 @@ import {
 
 // constants
 const ORACLE_PUBLIC_KEY =
-  'B62qphyUJg3TjMKi74T2rF8Yer5rQjBr1UyEG7Wg9XEYAHjaSiSqFv1';
+  'B62qqJQ4ys9ZwsBXTBNWopXUJswAh91pYXhpvFW6pCnWQoeGq9FqVSZ';
 
 // smart contract
 export class GithubAccountProof extends SmartContract {
@@ -64,7 +64,7 @@ export class GithubAccountProof extends SmartContract {
   // In other words, the oracle is not general purpose, and checking
   // logic is done inside the oracle, not inside the smart contract.
 
-  // The next step is to refactor this as outline above and make the
+  // The next step is to refactor this as outlined above and make the
   // oracle general purpose. Additionally, implement one (or more)
   // methods inside the smart contract, that check other attibutes.
 
@@ -79,7 +79,7 @@ export class GithubAccountProof extends SmartContract {
     this.oraclePublicKey.assertEquals(oraclePublicKey);
 
     // assert oracle response and signature validity
-    isValidUser.assertEquals(Field(1));
+    isValidUser.assertEquals(Field('1'));
     const validSignature = signature.verify(oraclePublicKey, [isValidUser]);
     validSignature.assertTrue();
 

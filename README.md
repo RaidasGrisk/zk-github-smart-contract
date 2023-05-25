@@ -1,4 +1,4 @@
-# Mina zkApp: Zk Reddit
+# Mina zkApp: Zk Github Smart Contract
 
 This template uses TypeScript.
 
