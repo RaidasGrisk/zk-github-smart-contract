@@ -31,8 +31,8 @@ export class GithubAccountProof extends SmartContract {
     });
   }
 
-  init(zkappKey: PrivateKey) {
-    super.init(zkappKey);
+  init() {
+    super.init();
     this.oraclePublicKey.set(PublicKey.fromBase58(ORACLE_PUBLIC_KEY));
 
     // why do we need this?

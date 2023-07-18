@@ -4,8 +4,16 @@
     "berkeley": {
       "url": "https://proxy.berkeley.minaexplorer.com/graphql",
       "keyPath": "keys/berkeley.json",
-      "feepayerKeyPath": "keys/berkeley.json",
-      "fee": "0.2",
+      "feepayerKeyPath": "keys/berkeley_payer.json",
+      "fee": "0.1",
+      "smartContract": "GithubAccountProof"
+    },
+    "berkeley_": {
+      "url": "https://proxy.berkeley.minaexplorer.com/graphql",
+      "keyPath": "keys/berkeley_.json",
+      "feepayerKeyPath": "/home/raidas/.cache/zkapp-cli/keys/berkeley_alias.json",
+      "feepayerAlias": "berkeley_alias",
+      "fee": "0.1",
       "smartContract": "GithubAccountProof"
     }
   }

@@ -59,7 +59,7 @@ describe('GithubAccountProof', () => {
     const txn = await Mina.transaction(deployerAccount, () => {
       AccountUpdate.fundNewAccount(deployerAccount);
       zkApp.deploy({ zkappKey: zkAppPrivatekey });
-      zkAppInstance.init(zkAppPrivatekey);
+      zkAppInstance.init();
     });
     await txn.prove();
     // this tx needs .sign(), because `deploy()` adds an account update that requires signature authorization
